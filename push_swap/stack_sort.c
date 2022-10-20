@@ -6,7 +6,7 @@
 /*   By: hyuncpar <hyuncpar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/14 17:27:51 by hyuncpar          #+#    #+#             */
-/*   Updated: 2022/10/18 22:42:28 by hyuncpar         ###   ########.fr       */
+/*   Updated: 2022/10/20 22:02:23 by hyuncpar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,49 +97,97 @@ void	down_tri(t_stack *stack, int goal)
 	}
 }
 
-void	make_triangle(t_stack *stack, int size, int direct)
+void	fill_arr(int n, int *arr, int index, int gap)
 {
-	if (size < 6)
+	if (n / 3 < 6)
+	{
+		*arr = n / 3;
+		*(arr + gap) = n / 3 + n % 3;
+		*(arr + gap * 2) = n / 3;
+	}
+	else
+	{
+		fill_arr(n / 3, arr, index / 3, gap);
+		fill_arr(n / 3 + n % 3, arr + index / 3, index / 3, gap);
+		fill_arr(n / 3, arr + index / 3 * 2, index / 3, gap);
+	}
+}
+
+int	*tri_shape(int size)
+{
+	int		len;
+	int		temp;
+	int		*arr;
+
+	len = 1;
+	temp = size;
+	while (temp > 5)
+	{
+		len *= 3;
+		temp /= 3;
+	}
+	arr = malloc(sizeof(int) * (len + 1));
+	if (!arr)
+		return (0);
+	fill_arr(size, arr, len / 3, len / 3);
+	arr[len] = 0;
+	return (arr);
+}
+
+void	make_triangle(t_stack *stack, int *shape, int direct, int size)
+{
+	if (size < 1)
 	{
 		if (direct)
-			up_tri(stack, stack->b_size + size);
+			up_tri(stack, stack->b_size + *shape);
 		else
-			down_tri(stack, stack->b_size + size);
+			down_tri(stack, stack->b_size + *shape);
 	}
 	else
 	{
 		if (direct)
 		{
-			make_triangle(stack, size / 3, 1);
-			make_triangle(stack, size / 3 + size % 3, 0);
-			make_triangle(stack, size / 3, 0);
+			make_triangle(stack, shape, 1, size / 3);
+			make_triangle(stack, shape + size, 0, size / 3);
+			make_triangle(stack, shape + size * 2, 0, size / 3);
 		}
 		else
 		{
-			make_triangle(stack, size / 3, 1);
-			make_triangle(stack, size / 3 + size % 3, 1);
-			make_triangle(stack, size / 3, 0);
+			make_triangle(stack, shape, 1, size / 3);
+			make_triangle(stack, shape + size, 1, size / 3);
+			make_triangle(stack, shape + size * 2, 0, size / 3);
 		}
 	}
 }
 
 void	stack_sort(t_stack *stack)
 {
-	t_node	*node;
+	int		*shape;
+	int		gap;
+	int		tmp;
+	int		i;
 
-	printf("atop: %d\n", stack->a_top->num);
-	printf("abottom: %d\n", stack->a_bottom->num);
-	printf("asize: %d\n", stack->a_size);
-	node = stack->a_top;
-	make_triangle(stack, stack->a_size, 1);
-	int cnt = stack->b_size / 3;
-	int size = stack->b_size;
-	printf("%d\n", size / 3);
-	while (cnt-- > 0)
+	gap = 1;
+	shape = tri_shape(stack->a_size);
+	if (!shape)
+		print_error(stack, "malloc error");
+	tmp = stack->a_size;
+	while (tmp > 5)
+	{
+		gap *= 3;
+		tmp /= 3;
+	}
+	gap /= 3;
+	i = gap;
+	tmp = 0;
+	make_triangle(stack, shape, 1, gap);
+	while (i > 0)
+		tmp += shape[--i];
+	while (tmp--)
 		push_a(stack);
-	print_stack(stack);
-	up_merge_left(stack, size / 9, 1);
-	print_stack(stack);
-	cnt = 1;
+	//print_stack(stack);
+	merge(stack, shape, gap);
+	//print_stack(stack);
+	//free(shape);
 	printf("exit\n");
 }
