@@ -1,35 +1,41 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   print_error.c                                      :+:      :+:    :+:   */
+/*   ft_strjoin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hyuncpar <hyuncpar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/10/13 20:52:18 by hyuncpar          #+#    #+#             */
-/*   Updated: 2022/10/21 19:09:07 by hyuncpar         ###   ########.fr       */
+/*   Created: 2022/07/20 20:43:59 by hyuncpar          #+#    #+#             */
+/*   Updated: 2022/10/21 20:18:09 by hyuncpar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-void	clear_stack(t_stack *stack)
+char	*ft_strjoin(char const *s1, char const *s2)
 {
-	t_node	*node;
-	t_node	*temp;
+	size_t	i;
+	size_t	j;
+	size_t	len;
+	char	*tmp;
 
-	node = stack->at;
-	while (node)
+	i = 0;
+	j = -1;
+	len = ft_strlen(s1) + ft_strlen(s2) + 1;
+	tmp = (char *)malloc(sizeof(char) * len);
+	if (!tmp)
+		return (0);
+	while (++j < ft_strlen(s1))
 	{
-		temp = node->next;
-		free(node);
-		node = temp;
+		tmp[i] = s1[j];
+		i++;
 	}
-}
-
-void	print_error(t_stack	*stack, char *str)
-{
-	clear_stack(stack);
-	write(2, "Error\n", 6);
-	write(1, str, ft_strlen(str));
-	exit(1);
+	j = -1;
+	while (++j < ft_strlen(s2))
+	{
+		tmp[i] = s2[j];
+		i++;
+	}
+	tmp[i] = '\0';
+	return (tmp);
 }

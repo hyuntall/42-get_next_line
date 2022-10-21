@@ -6,13 +6,13 @@
 /*   By: hyuncpar <hyuncpar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 14:42:06 by hyuncpar          #+#    #+#             */
-/*   Updated: 2022/10/17 15:20:25 by hyuncpar         ###   ########.fr       */
+/*   Updated: 2022/10/21 19:17:13 by hyuncpar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-int	is_space(char c)
+static int	is_space(char c)
 {
 	if (c == ' ' || c == '\t' || c == '\v')
 		return (1);
@@ -82,11 +82,11 @@ int	argv_to_stack(t_stack *stack, char **argv)
 	i = -1;
 	while (sstack[++i])
 	{
-		if (!stack->a_top)
+		if (!stack->at)
 			first_insert(stack, ft_atoll(stack, sstack[i]));
 		else
 			node_insert(stack, ft_atoll(stack, sstack[i]));
-		stack->a_size += 1;
+		stack->as += 1;
 	}
 	i = 0;
 	while (sstack[i])

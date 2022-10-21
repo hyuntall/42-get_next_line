@@ -6,197 +6,148 @@
 /*   By: hyuncpar <hyuncpar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/17 18:43:05 by hyuncpar          #+#    #+#             */
-/*   Updated: 2022/10/20 22:05:13 by hyuncpar         ###   ########.fr       */
+/*   Updated: 2022/10/21 19:09:00 by hyuncpar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-void	up_merge_left(t_stack *stack, int size, int LR)
-{
-	int	a;
-	int	b;
-	int	c;
-	size = 0;
-	LR = 0;
-	a = 3;
-	b = 3;
-	c = 3;
-	print_stack(stack);
-	while (a && b && c)
-	{
-		if (stack->a_bottom->num > stack->b_top->num && stack->a_bottom->num > stack->b_bottom->num)
-		{
-			reverse_rotate_a(stack);
-			a--;
-		}
-		else if (stack->b_top->num > stack->a_bottom->num && stack->b_top->num > stack->b_bottom->num)
-		{
-			push_a(stack);
-			b--;
-		}
-		else if (stack->b_bottom->num > stack->a_bottom->num && stack->b_bottom->num > stack->b_top->num)
-		{
-			reverse_rotate_b(stack);
-			push_a(stack);
-			c--;
-		}
-		printf("a: %d b: %d c: %d\n", stack->a_bottom->num, stack->b_bottom->num, stack->b_top->num);
-	}
-	printf("a: %d b: %d c: %d\n", a, b, c);
-	print_stack(stack);
-	while ((!a && b && c) || (a && !b && c) || (a && b && !c))
-	{
-		printf("a: %d b: %d c: %d\n", a, b, c);
-		if (!a && b && c)
-		{
-			if (stack->b_top->num > stack->a_bottom->num)
-			{
-				push_a(stack);
-				b--;
-			}
-			else
-			{
-				reverse_rotate_b(stack);
-				push_a(stack);
-				c--;
-			}
-		}
-		else if (a && !b && c)
-		{
-			if (stack->a_bottom->num > stack->b_bottom->num)
-			{
-				reverse_rotate_a(stack);
-				a--;
-			}
-			else
-			{
-				reverse_rotate_b(stack);
-				push_a(stack);
-				c--;
-			}
-		}
-		else if (a && b && !c)
-		{
-			if (stack->a_bottom->num > stack->b_top->num)
-			{
-				reverse_rotate_a(stack);
-				a--;
-			}
-			else
-			{
-				push_a(stack);
-				b--;
-			}
-		}
-	}
-	printf("a: %d b: %d c: %d\n", a, b, c);
-	print_stack(stack);
-	while (a)
-	{
-		reverse_rotate_a(stack);
-		a--;
-	}
-	while (b)
-	{
-		push_a(stack);
-		b--;
-	}
-	while (c)
-	{
-		reverse_rotate_b(stack);
-		push_a(stack);
-		c--;
-	}
-	print_stack(stack);
-}
-
-void	up_merge(t_stack *stack, int ab, int bt, int bb)
+void	up_merge_l(t_stack *s, int ab, int bt, int bb)
 {
 	while (ab > 0 || bt > 0 || bb > 0)
 	{
-		if ((ab && stack->a_bottom->num > stack->b_top->num && stack->a_bottom->num > stack->b_bottom->num) || \
-		(ab && !bt && stack->a_bottom->num > stack->b_bottom->num) || \
-		(ab && !bb && stack->a_bottom->num > stack->b_top->num) || (ab && !bt && !bb))
+		if ((ab && !bt && !bb) || (ab && !bb && s->ab->n > s->bt->n) \
+		|| (ab && s->ab->n > s->bt->n && s->ab->n > s->bb->n) || \
+		(ab && !bt && s->ab->n > s->bb->n))
 		{
-			reverse_rotate_a(stack);
+			reverse_rotate_a(s);
 			ab--;
 		}
-		else if ((bt && stack->b_top->num > stack->a_bottom->num && stack->b_top->num > stack->b_bottom->num) || \
-		(bt && !ab && stack->b_top->num > stack->b_bottom->num) || \
-		(bt && !bb && stack->b_top->num > stack->a_bottom->num) || (!ab && bt && !bb))
+		else if ((!ab && bt && !bb) || (bt && !bb && s->bt->n > s->ab->n) \
+		|| (bt && s->bt->n > s->ab->n && s->bt->n > s->bb->n) || \
+		(bt && !ab && s->bt->n > s->bb->n))
 		{
-			push_a(stack);
+			push_a(s);
 			bt--;
 		}
-		else if ((bb && stack->b_bottom->num > stack->a_bottom->num && stack->b_bottom->num > stack->b_top->num) || \
-		(bb && !ab && stack->b_bottom->num > stack->b_top->num) || \
-		(bb && !bt && stack->b_bottom->num > stack->a_bottom->num) || (!ab && !bt && bb))
+		else if ((!ab && !bt && bb) || (bb && !bt && s->bb->n > s->ab->n) \
+		|| (bb && s->bb->n > s->ab->n && s->bb->n > s->bt->n) || \
+		(bb && !ab && s->bb->n > s->bt->n))
 		{
-			reverse_rotate_b(stack);
-			push_a(stack);
+			reverse_rotate_b(s);
+			push_a(s);
 			bb--;
 		}
 	}
 }
 
-void	down_merge(t_stack *stack, int ab, int bt, int bb)
+void	down_merge_l(t_stack *s, int ab, int bt, int bb)
 {
 	while (ab > 0 || bt > 0 || bb > 0)
 	{
-		if ((ab && stack->a_bottom->num < stack->b_top->num && stack->a_bottom->num < stack->b_bottom->num) || \
-		(ab && !bt && stack->a_bottom->num < stack->b_bottom->num) || \
-		(ab && !bb && stack->a_bottom->num < stack->b_top->num) || (ab && !bt && !bb))
+		if ((ab && !bt && !bb) || (ab && !bb && s->ab->n < s->bt->n) \
+		|| (ab && s->ab->n < s->bt->n && s->ab->n < s->bb->n) || \
+		(ab && !bt && s->ab->n < s->bb->n))
 		{
-			reverse_rotate_a(stack);
+			reverse_rotate_a(s);
 			ab--;
 		}
-		else if ((bt && stack->b_top->num < stack->a_bottom->num && stack->b_top->num < stack->b_bottom->num) || \
-		(bt && !ab && stack->b_top->num < stack->b_bottom->num) || \
-		(bt && !bb && stack->b_top->num < stack->a_bottom->num) || (!ab && bt && !bb))
+		else if ((!ab && bt && !bb) || (bt && !bb && s->bt->n < s->ab->n) \
+		|| (bt && s->bt->n < s->ab->n && s->bt->n < s->bb->n) || \
+		(bt && !ab && s->bt->n < s->bb->n))
 		{
-			push_a(stack);
+			push_a(s);
 			bt--;
 		}
-		else if ((bb && stack->b_bottom->num < stack->a_bottom->num && stack->b_bottom->num < stack->b_top->num) || \
-		(bb && !ab && stack->b_bottom->num < stack->b_top->num) || \
-		(bb && !bt && stack->b_bottom->num < stack->a_bottom->num) || (!ab && !bt && bb))
+		else if ((!ab && !bt && bb) || (bb && !bt && s->bb->n < s->ab->n) \
+		|| (bb && s->bb->n < s->ab->n && s->bb->n < s->bt->n) || \
+		(bb && !ab && s->bb->n < s->bt->n))
 		{
-			reverse_rotate_b(stack);
-			push_a(stack);
+			reverse_rotate_b(s);
+			push_a(s);
 			bb--;
 		}
 	}
 }
 
-void	merge(t_stack *stack, int *shape, int gap)
+void	up_merge_r(t_stack *s, int bb, int at, int ab)
+{
+	while (bb > 0 || at > 0 || ab > 0)
+	{
+		if ((bb && !at && !ab) || (bb && !ab && s->bb->n > s->at->n) \
+		|| (bb && s->bb->n > s->at->n && s->bb->n > s->ab->n) || \
+		(bb && !at && s->bb->n > s->ab->n))
+		{
+			reverse_rotate_b(s);
+			bb--;
+		}
+		else if ((!bb && at && !ab) || (at && !ab && s->at->n > s->bb->n) \
+		|| (at && s->at->n > s->bb->n && s->at->n > s->ab->n) || \
+		(at && !bb && s->at->n > s->ab->n))
+		{
+			push_b(s);
+			at--;
+		}
+		else if ((!bb && !at && ab) || (ab && !at && s->ab->n > s->bb->n) \
+		|| (ab && s->ab->n > s->bb->n && s->ab->n > s->at->n) || \
+		(ab && !bb && s->ab->n > s->at->n))
+		{
+			reverse_rotate_a(s);
+			push_b(s);
+			ab--;
+		}
+	}
+}
+
+void	down_merge_r(t_stack *s, int bb, int at, int ab)
+{
+	while (bb > 0 || at > 0 || ab > 0)
+	{
+		if ((bb && !at && !ab) || (bb && !ab && s->bb->n < s->at->n) \
+		|| (bb && s->bb->n < s->at->n && s->bb->n < s->ab->n) || \
+		(bb && !at && s->bb->n < s->ab->n))
+		{
+			reverse_rotate_b(s);
+			bb--;
+		}
+		else if ((!bb && at && !ab) || (at && !ab && s->at->n < s->bb->n) \
+		|| (at && s->at->n < s->bb->n && s->at->n < s->ab->n) || \
+		(at && !bb && s->at->n < s->ab->n))
+		{
+			push_b(s);
+			at--;
+		}
+		else if ((!bb && !at && ab) || (ab && !at && s->ab->n < s->bb->n) \
+		|| (ab && s->ab->n < s->bb->n && s->ab->n < s->at->n) || \
+		(ab && !bb && s->ab->n < s->at->n))
+		{
+			reverse_rotate_a(s);
+			push_b(s);
+			ab--;
+		}
+	}
+}
+
+void	merge(t_stack *stack, int *shape, int gap, int lr)
 {
 	int		i;
-	int		a;
-	int		b;
-	int		c;
+	int		*tri_direct;
 
+	tri_direct = malloc(sizeof(int) * (gap + 1));
+	make_direct(gap, tri_direct, 1, 0);
+	tri_direct[gap] = 0;
 	i = -1;
-	if (++i < 1)
+	while (++i < gap)
 	{
-		printf("gap:%d %d\n", shape[gap], gap);
-		a = shape[i];
-		b = shape[gap + i];
-		c = shape[2 * gap + i++];
-		up_merge(stack, a, b, c);
-		//print_stack(stack);
-		printf("%d %d %d\n", a, b, c);
-		a = shape[i];
-		b = shape[gap + i];
-		c = shape[2 * gap + i++];
-		down_merge(stack, a, b, c);
-		//print_stack(stack);
-		printf("%d %d %d\n", a, b, c);
-		a = shape[i];
-		b = shape[gap + i];
-		c = shape[2 * gap + i];
-		down_merge(stack, a, b, c);
-		//print_stack(stack);
-		printf("%d %d %d\n", a, b, c);
+		if (tri_direct[i] > 0 && lr)
+			up_merge_l(stack, shape[i], shape[gap + i], shape[2 * gap + i]);
+		else if (tri_direct[i] < 0 && lr)
+			down_merge_l(stack, shape[i], shape[gap + i], shape[2 * gap + i]);
+		else if (tri_direct[i] > 0 && !lr)
+			up_merge_r(stack, shape[i], shape[gap + i], shape[2 * gap + i]);
+		else if (tri_direct[i] < 0 && !lr)
+			down_merge_r(stack, shape[i], shape[gap + i], shape[2 * gap + i]);
 	}
+	free(tri_direct);
+	tri_direct = 0;
 }

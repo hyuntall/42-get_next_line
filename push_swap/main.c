@@ -6,7 +6,7 @@
 /*   By: hyuncpar <hyuncpar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 13:29:04 by hyuncpar          #+#    #+#             */
-/*   Updated: 2022/10/17 15:28:01 by hyuncpar         ###   ########.fr       */
+/*   Updated: 2022/10/21 21:37:02 by hyuncpar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,12 @@
 
 void	init(t_stack *stack)
 {
-	stack->a_size = 0;
-	stack->a_top = 0;
-	stack->a_bottom = 0;
-	stack->b_size = 0;
-	stack->b_top = 0;
-	stack->b_bottom = 0;
+	stack->as = 0;
+	stack->at = 0;
+	stack->ab = 0;
+	stack->bs = 0;
+	stack->bt = 0;
+	stack->bb = 0;
 }
 
 void	small_size_sort(t_stack *stack)
@@ -29,9 +29,11 @@ void	small_size_sort(t_stack *stack)
 	int	second;
 	int	third;
 
-	first = stack->a_top->num;
-	second = stack->a_top->next->num;
-	third = stack->a_bottom->num;
+	first = stack->at->n;
+	second = stack->at->next->n;
+	third = stack->ab->n;
+	if (stack_is_sort(stack))
+		return ;
 	if (third > first && first > second)
 		swap_a(stack);
 	else if (first > second && second > third)
@@ -48,6 +50,65 @@ void	small_size_sort(t_stack *stack)
 	}
 	else
 		reverse_rotate_a(stack);
+}
+
+void	small_size_sort_b(t_stack *stack)
+{
+	int	first;
+	int	second;
+	int	third;
+
+	first = stack->bt->n;
+	second = stack->bt->next->n;
+	third = stack->bb->n;
+	if (stack->bs == 2 && first < third)
+		swap_b(stack);
+	else if (third > second && second > first)
+	{
+		rotate_b(stack);
+		swap_b(stack);
+	}
+	else if (second > third && third > first)
+		rotate_b(stack);
+	else if (third > first && first > second)
+		reverse_rotate_b(stack);
+	else if (second > first && first > third)
+		swap_b(stack);
+	else
+	{
+		swap_b(stack);
+		rotate_b(stack);
+	}
+}
+
+void	six_under_sort(t_stack *stack)
+{
+	while (stack->as > 3)
+		push_b(stack);
+	small_size_sort(stack);
+	print_stack(stack);
+	small_size_sort_b(stack);
+	while (stack->bs > 0)
+	{
+		if (stack->at->n > stack->bt->n)
+			push_a(stack);
+		else if ((!stack->as && stack->bt->n > stack->bb->n) \
+		|| (stack->bt->n > stack->bb->n \
+		&& stack->bt->n > stack->ab->n))
+			push_a(stack);
+		else if ((!stack->as && stack->bb->n > stack->bt->n) \
+		|| (stack->bb->n > stack->bt->n \
+		&& stack->bb->n > stack->ab->n))
+		{
+			reverse_rotate_b(stack);
+			push_a(stack);
+		}
+		else if ((stack->ab && stack->at->n > stack->ab->n) \
+		|| (stack->ab->n > stack->bt->n \
+		&& stack->ab->n > stack->bb->n))
+			reverse_rotate_a(stack);
+	}
+	print_stack(stack);
 }
 
 int	main(int argc, char **argv)
@@ -67,12 +128,13 @@ int	main(int argc, char **argv)
 		clear_stack(&stack);
 		return (0);
 	}
-	if (stack.a_size == 2)
+	if (stack.as == 2)
 		swap_a(&stack);
-	else if (stack.a_size == 3)
+	else if (stack.as == 3)
 		small_size_sort(&stack);
+	else if (stack.as < 7)
+		six_under_sort(&stack);
 	else
 		stack_sort(&stack);
-	//system("leaks a.out");
 	return (0);
 }

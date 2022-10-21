@@ -6,7 +6,7 @@
 /*   By: hyuncpar <hyuncpar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 22:15:17 by hyuncpar          #+#    #+#             */
-/*   Updated: 2022/10/17 14:44:09 by hyuncpar         ###   ########.fr       */
+/*   Updated: 2022/10/21 15:43:00 by hyuncpar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,32 +16,32 @@ void	push_b(t_stack *stack)
 {
 	t_node	*node;
 
-	if (stack->a_size == 0)
+	if (stack->as == 0)
 		return ;
-	node = stack->a_top;
-	if (stack->a_size > 1)
+	node = stack->at;
+	if (stack->as > 1)
 	{
-		stack->a_top = stack->a_top->next;
-		stack->a_top->prev = 0;
+		stack->at = stack->at->next;
+		stack->at->prev = 0;
 	}
-	if (stack->b_size == 0)
+	if (stack->bs == 0)
 	{
 		node->next = 0;
-		stack->b_top = node;
-		stack->b_bottom = node;
+		stack->bt = node;
+		stack->bb = node;
 	}
 	else
 	{
-		node->next = stack->b_top;
-		stack->b_top->prev = node;
-		stack->b_top = node;
+		node->next = stack->bt;
+		stack->bt->prev = node;
+		stack->bt = node;
 	}
-	stack->b_size += 1;
-	stack->a_size -= 1;
-	if (stack->a_size == 0)
+	stack->bs += 1;
+	stack->as -= 1;
+	if (stack->as == 0)
 	{
-		stack->a_top = 0;
-		stack->a_bottom = 0;
+		stack->at = 0;
+		stack->ab = 0;
 	}
 	write(1, "pb\n", 3);
 }
@@ -50,32 +50,32 @@ void	push_a(t_stack *stack)
 {
 	t_node	*node;
 
-	if (stack->b_size == 0)
+	if (stack->bs == 0)
 		return ;
-	node = stack->b_top;
-	if (stack->b_size > 1)
+	node = stack->bt;
+	if (stack->bs > 1)
 	{
-		stack->b_top = stack->b_top->next;
-		stack->b_top->prev = 0;
+		stack->bt = stack->bt->next;
+		stack->bt->prev = 0;
 	}
-	if (stack->a_size == 0)
+	if (stack->as == 0)
 	{
 		node->next = 0;
-		stack->a_top = node;
-		stack->a_bottom = node;
+		stack->at = node;
+		stack->ab = node;
 	}
 	else
 	{
-		node->next = stack->a_top;
-		stack->a_top->prev = node;
-		stack->a_top = node;
+		node->next = stack->at;
+		stack->at->prev = node;
+		stack->at = node;
 	}
-	stack->a_size += 1;
-	stack->b_size -= 1;
-	if (stack->b_size == 0)
+	stack->as += 1;
+	stack->bs -= 1;
+	if (stack->bs == 0)
 	{
-		stack->b_top = 0;
-		stack->b_bottom = 0;
+		stack->bt = 0;
+		stack->bb = 0;
 	}
 	write(1, "pa\n", 3);
 }
